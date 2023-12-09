@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from 'react';
 import { useSDK } from '@metamask/sdk-react';
-import { ABI } from './ABI';
+import { ABI, smartContractAddress } from './ABI';
 import Web3 from 'web3';
 
 const ConnectWalletButton = () => {
@@ -67,7 +67,7 @@ export default function Header() {
                     await window.ethereum.enable();
                     const accounts = await window.web3.eth.getAccounts();
 
-                    const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                    const contractAddress = smartContractAddress;
                     const contractABI = ABI;
 
                     const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -88,7 +88,7 @@ export default function Header() {
                     await window.ethereum.enable();
                     const accounts = await window.web3.eth.getAccounts();
 
-                    const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                    const contractAddress = smartContractAddress;
                     const contractABI = ABI;
 
                     const contract = new window.web3.eth.Contract(contractABI, contractAddress);

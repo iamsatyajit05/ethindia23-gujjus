@@ -1,14 +1,12 @@
 "use client"
 import { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { useSDK } from '@metamask/sdk-react';
 import toast from 'react-hot-toast';
-import { ABI } from './ABI';
+import { ABI, smartContractAddress } from './ABI';
 import Web3 from 'web3';
 
 export default function Stake() {
-    const fixedStakeAmount = 1;
+    const fixedStakeAmount = 0.1;
 
     const { account } = useSDK();
     const [stakeWeek, setStakeWeek] = useState('');
@@ -27,7 +25,7 @@ export default function Stake() {
                 await window.ethereum.enable();
                 const accounts = await window.web3.eth.getAccounts();
 
-                const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                const contractAddress = smartContractAddress;
                 const contractABI = ABI;
 
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -58,7 +56,7 @@ export default function Stake() {
                 await window.ethereum.enable();
                 const accounts = await window.web3.eth.getAccounts();
 
-                const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                const contractAddress = smartContractAddress;
                 const contractABI = ABI;
 
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -85,7 +83,7 @@ export default function Stake() {
                 await window.ethereum.enable();
                 const accounts = await window.web3.eth.getAccounts();
 
-                const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                const contractAddress = smartContractAddress;
                 const contractABI = ABI;
 
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -113,16 +111,17 @@ export default function Stake() {
                 await window.ethereum.enable();
                 const accounts = await window.web3.eth.getAccounts();
 
-                const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                const contractAddress = smartContractAddress;
                 const contractABI = ABI;
 
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
 
                 const reward = await contract.methods.calculateReward(accounts[0]).call();
+                const rewardInEther = web3.utils.fromWei(reward['1'], 'ether');
 
-                console.log("calculateReward:", reward);
+                console.log("calculateReward:", rewardInEther);
 
-                // setRewardAmount(re)
+                setRewardAmount(rewardInEther)
             } catch (error) {
                 console.error('Error fetching calculateReward:', error);
                 toast.error("Something went wrong!");
@@ -140,7 +139,7 @@ export default function Stake() {
                 await window.ethereum.enable();
                 const accounts = await window.web3.eth.getAccounts();
 
-                const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                const contractAddress = smartContractAddress;
                 const contractABI = ABI;
 
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -160,6 +159,32 @@ export default function Stake() {
         }
     };
 
+    const checkAlreadyWithdraw = async () => {
+        if (window.ethereum) {
+            window.web3 = new Web3(window.ethereum);
+            try {
+                await window.ethereum.enable();
+                const accounts = await window.web3.eth.getAccounts();
+
+                const contractAddress = smartContractAddress;
+                const contractABI = ABI;
+
+                const contract = new window.web3.eth.Contract(contractABI, contractAddress);
+
+                const status = await contract.methods.getAlreadyWithdrawn(accounts[0]).call();
+
+                console.log("checkAlreadyWithdraw:", status);
+                setIsWithdrawn(status)
+            } catch (error) {
+                console.error('Error fetching checkAlreadyWithdraw:', error);
+                toast.error("Something went wrong!");
+            }
+        } else {
+            console.error('Web3 not detected. Please install MetaMask.');
+            toast.error("Please install MetaMask.");
+        }
+    }
+
     useEffect(() => {
         alreadyStakedChecked();
 
@@ -168,9 +193,15 @@ export default function Stake() {
         fetchTotalStakedAmount();
 
         calculateReward();
+
+        checkAlreadyWithdraw();
     }, []);
 
     const stakeAmount = async () => {
+        toast('Transaction is pending...', {
+            icon: '⌛',
+        });
+
         const [predictYear, predictWeek] = stakeWeek.split('-W');
         if (isAlreadyStaked) {
             toast.error("You have staked, Already!");
@@ -201,7 +232,7 @@ export default function Stake() {
                 const accounts = await window.web3.eth.getAccounts();
                 const account = accounts[0];
 
-                const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+                const contractAddress = '0xEDf85CF5996b97c2c966eE68711b18560EeC7034';
                 const contractABI = ABI;
 
                 const gasPrice = await web3.eth.getGasPrice();
@@ -243,18 +274,11 @@ export default function Stake() {
     };
 
     const claimReward = async () => {
-        if (!account) {
-            toast.error("Connect Wallet First!");
-            return;
-        }
-
-        if (isWithdrawn) {
-            toast.error("Reward already claimed!");
-            return;
-        }
-
+        toast('Transaction is pending...', {
+            icon: '⌛',
+        });
         try {
-            const contractAddress = '0x2337641E1EaeeA2afc26F3Df7E02f50DE1A4e150';
+            const contractAddress = '0xEDf85CF5996b97c2c966eE68711b18560EeC7034';
             const contractABI = ABI;
 
             const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -288,18 +312,18 @@ export default function Stake() {
                     ? <div className="flex-1 bg-[#1e2a47] flex justify-center items-center h-72 rounded-2xl p-8">
                         Connect the wallet first
                     </div>
-                //     : !isDateAnnounced && predictWeek == 0
-                //     ?  <div className="flex-1 bg-[#1e2a47] flex flex-col justify-center items-center h-72 rounded-2xl p-8">
-                //     <p>Sorry, but you cant use this now.</p>
-                //                     <p>Launch Date is Announced.</p>
-                // </div>
-                    :<>
+                    //     : !isDateAnnounced && predictWeek == 0
+                    //     ?  <div className="flex-1 bg-[#1e2a47] flex flex-col justify-center items-center h-72 rounded-2xl p-8">
+                    //     <p>Sorry, but you cant use this now.</p>
+                    //                     <p>Launch Date is Announced.</p>
+                    // </div>
+                    : <>
                         <div className="flex-1 bg-[#1e2a47] flex flex-col justify-between h-72 rounded-2xl p-8">
 
                             {isDateAnnounced
-                                ? <div className='flex flex-col justify-center items-center h-full'>
-                                    <p>Sorry, but you cant stake now.</p>
-                                    <p>Launch Date is Announced.</p>
+                                ? <div className={`${predictWeek == 0 ? 'flex-1' : ''} flex flex-col justify-center items-center h-full`}>
+                                    <p className='text-lg'>Sorry, but you cant stake now.</p>
+                                    <p className='text-lg'>Launch Date is Announced.</p>
                                 </div>
                                 : <>
                                     <div className='flex items-center flex-col'>
@@ -316,7 +340,7 @@ export default function Stake() {
                                     </div>
                                     <div className='space-y-2'>
                                         <input id="week" type="week" name="week"
-                                            className='w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition'
+                                            className='w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition' disabled={isAlreadyStaked}
                                             onChange={(e) => setStakeWeek(e.target.value)} />
 
                                         <button type="button"
@@ -327,46 +351,46 @@ export default function Stake() {
                             }
 
                         </div>
-                        <div className="flex-1 bg-[#1e2a47] rounded-2xl h-72 p-8 space-y-8">
+                        <div className={`${predictWeek == 0 ? 'hidden' : ''} flex-1 bg-[#1e2a47] rounded-2xl h-72 p-8 space-y-4 flex flex-col justify-center items-center text-center`}>
                             {isDateAnnounced
-                                ? rewardAmount
-                                    ? <div className='flex flex-col justify-center items-center h-full text-center'>
-                                        <p>Your preidcation for release in <b>Week {predictWeek}, 2025</b> becomes reality.</p>
-                                        <p>You won the jackpot, your reward is <b>{rewardAmount} Matic</b>!</p>
+                                ? rewardAmount != 0
+                                    ? <div className='flex flex-col justify-center items-center text-center'>
+                                        <p className='text-lg'>Your preidcation for release in <b>Week {predictWeek}, 2025</b> becomes reality.</p>
+                                        <p className='text-lg'>You won the jackpot, your reward is <b>{rewardAmount} Matic</b>!</p>
                                     </div>
-                                    : <div className='flex flex-col justify-center items-center h-full text-center'>
-                                        <p>Your preidcation for release in <b>Week {predictWeek}, 2025</b> was not right.</p>
-                                        <p>You didn't won the jackpot!</p>
+                                    : <div className='flex flex-col justify-center items-center text-center'>
+                                        <p className='text-lg'>Your preidcation for release in <b>Week {predictWeek}, 2025</b> was not right.</p>
+                                        <p className='text-lg'>You didn't won the jackpot!</p>
                                     </div>
                                 : isAlreadyStaked
                                     ? <div>
-                                        <p>You can win <b>{totalStakedAmount} Matic</b>, <br /> If your pridiction about launch on <b>Week {predictWeek}, 2025</b> becomes true.</p>
+                                        <p className='text-lg'>You will win <b>{rewardAmount} Matic</b>, <br /> If your pridiction about launch on <b>Week {predictWeek}, 2025</b> becomes true.</p>
                                     </div>
                                     : <div>
-                                        <p>Stake money to win jackpot!</p>
+                                        <p className='text-lg'>Stake money to win jackpot!</p>
                                     </div>}
                             {isDateAnnounced
-                                ? rewardAmount
+                                ? rewardAmount != 0
                                     ?
-                                    <div>
-                                        <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" onClick={claimReward} disabled={isAlreadyStaked}>
-                                            {isWithdrawn
-                                                ? 'Already Withdrawn'
-                                                : 'Withdraw Jackpot'}
-                                        </button>
-                                    </div>
-
-                                    : <div>Better Luck Next Time</div>
-                                : <div className='flex justify-center space-x-2'>
-                                    <div className="h-5 w-5">
-                                        <FontAwesomeIcon icon={faClock} />
-                                    </div>
-                                    <span>Date Not Announced Yet</span>
+                                    <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" onClick={claimReward} disabled={isWithdrawn}>
+                                        {isWithdrawn
+                                            ? 'Already Withdrawn'
+                                            : 'Withdraw Jackpot'}
+                                    </button>
+                                    : <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" disabled={true}>
+                                        Better Luck Next Time
+                                    </button>
+                                : <div>
+                                    <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" disabled={true}>
+                                        Date Not Announced Yet
+                                    </button>
                                 </div>}
                         </div></>
                 }
             </div>
-            <button onClick={setDate}>SET DATE</button>
+            {account && account == "0x9740B274fe05bCD05C0557C96EB2C3993e39556a"
+                ? <button onClick={setDate}>SET DATE</button>
+                : ''}
         </main>
     )
 }

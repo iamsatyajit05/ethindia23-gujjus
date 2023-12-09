@@ -144,6 +144,25 @@ export const ABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "getAlreadyWithdrawn",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "getLaunchDate",
 		"outputs": [
@@ -177,6 +196,11 @@ export const ABI = [
 						"internalType": "uint256",
 						"name": "predictWeek",
 						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isWithdraw",
+						"type": "bool"
 					}
 				],
 				"internalType": "struct LeonidaCasino.StakingInfo",
@@ -245,6 +269,11 @@ export const ABI = [
 				"internalType": "uint256",
 				"name": "predictWeek",
 				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isWithdraw",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -277,3 +306,5 @@ export const ABI = [
 		"type": "function"
 	}
 ]
+
+export const smartContractAddress = '0xEDf85CF5996b97c2c966eE68711b18560EeC7034';
