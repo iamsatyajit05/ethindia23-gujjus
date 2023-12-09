@@ -1,17 +1,41 @@
+"use client"
+import { useEffect, useState } from 'react';
 import Image from 'next/image'
 import Stake from './components/Stake';
 import Waves from './components/Waves';
 import Header from './components/Header';
+const ethers = require("ethers");
+import { useSDK, MetaMaskProvider } from '@metamask/sdk-react';
+import toast, { Toaster } from 'react-hot-toast';
+
+// const provider = new ethers.BrowserProvider(window.ethereum);
 
 export default function Home() {
+  const [userAddress, setUserAddress] = useState('');
+
+  const host = typeof window !== "undefined" ? window.location.host : "defaultHost";
+  const sdkOptions = {
+    logging: { developerMode: false },
+    checkInstallationImmediately: false,
+    dappMetadata: {
+      name: "Next-Metamask-Boilerplate",
+      url: host,
+    },
+  };
+
   return (
     <>
-      {/* <Hero /> */}
-      <div className='w-screen h-screen space-y-8'>
-        <Header />
-        <Stake />
-        {/* <Waves /> */}
-      </div>
+      <MetaMaskProvider debug={false} sdkOptions={sdkOptions}>
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+        />
+        <div className='w-screen h-screen space-y-8'>
+          <Header />
+          <Stake />
+          {/* <Waves /> */}
+        </div>
+      </MetaMaskProvider>
     </>
   )
 }

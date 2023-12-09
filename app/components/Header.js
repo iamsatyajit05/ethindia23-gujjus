@@ -1,7 +1,26 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClock } from '@fortawesome/free-regular-svg-icons'
+import { useSDK } from '@metamask/sdk-react';
+
+const ConnectWalletButton = () => {
+    const { sdk, connected, connecting, account } = useSDK();
+
+    const connect = async () => {
+        console.log('Lag gayes');
+        try {
+            await sdk?.connect();
+        } catch (err) {
+            console.warn(`No accounts found`, err);
+        }
+    };
+
+    return (
+        <button className="font-medium cursor-pointer rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" disabled={connecting || account} onClick={connect}>
+            {account ? `${account.substring(0, 5)}....${account.substring(account.length - 4)}` : 'Connect Wallet'}
+        </button>
+    )
+}
 
 export default function Header() {
+    console.log(ConnectWalletButton);
     return (
         <main className="max-w-7xl m-auto flex justify-between pt-12">
             <div>
@@ -10,7 +29,7 @@ export default function Header() {
                 <p className='text-2xl'>STAKED BY 142 ROCKERS</p>
             </div>
             <div>
-            <button type="button" class="border focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-800 text-white border-gray-600 :hover:bg-gray-700 hover:border-gray-600 focus:ring-gray-700">Connect Wallet</button>
+                    <ConnectWalletButton />
             </div>
         </main>
     )
