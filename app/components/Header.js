@@ -1,7 +1,11 @@
+"use client"
+import { useEffect, useState } from 'react';
 import { useSDK } from '@metamask/sdk-react';
+import { ABI } from './ABI';
+import Web3 from 'web3';
 
 const ConnectWalletButton = () => {
-    const { sdk, connected, connecting, account } = useSDK();
+    const { sdk, connecting, account } = useSDK();
 
     const connect = async () => {
         console.log('Lag gayes');
@@ -20,16 +24,69 @@ const ConnectWalletButton = () => {
 }
 
 export default function Header() {
-    console.log(ConnectWalletButton);
+    const [totalStakedAmount, setTotalStakedAmount] = useState(0);
+    const [totalStaker, setTotalStaker] = useState(0);
+    const { account } = useSDK();
+
+    useEffect(() => {
+        const fetchTotalStakedAmount = async () => {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
+                    const accounts = await window.web3.eth.getAccounts();
+
+                    const contractAddress = '0x5Aefe4d7391379c0D0Ad24eb6B18b8F173872790';
+                    const contractABI = ABI;
+
+                    const contract = new window.web3.eth.Contract(contractABI, contractAddress);
+
+                    const totalStaked = await contract.methods.totalStakedAmount.call().call();
+
+                    console.log("totalStaked:", totalStaked);
+
+                    setTotalStakedAmount(totalStaked);
+                } catch (error) {
+                    console.error('Error fetching totalStakedAmount:', error);
+                    toast.error("Something went wrong!");
+                }
+
+                try {
+                    await window.ethereum.enable();
+                    const accounts = await window.web3.eth.getAccounts();
+
+                    const contractAddress = '0x5Aefe4d7391379c0D0Ad24eb6B18b8F173872790';
+                    const contractABI = ABI;
+
+                    const contract = new window.web3.eth.Contract(contractABI, contractAddress);
+
+                    const allAddresses = await contract.methods.totalStaker.call().call();
+
+                    console.log("allAddresses:", allAddresses);
+
+                    setTotalStaker(allAddresses);
+                } catch (error) {
+                    console.error('Error fetching allAddresses:', error);
+                    toast.error("Something went wrong!");
+                }
+            } else {
+                console.error('Web3 not detected. Please install MetaMask.');
+                toast.error("Please install MetaMask.");
+            }
+        };
+
+        fetchTotalStakedAmount();
+    }, []);
+
     return (
         <main className="max-w-7xl m-auto flex justify-between pt-12">
             <div>
                 <p className='text-2xl'>LEONIDA CASINO</p>
-                <p className='text-9xl font-black'>45125 MATIC</p>
-                <p className='text-2xl'>STAKED BY 142 ROCKERS</p>
+                <p className='text-9xl font-black'>{totalStakedAmount ? totalStakedAmount : '0'} MATIC</p>
+                <p className='text-2xl'>STAKED BY {totalStaker ? totalStaker : '0'} ROCKERS</p>
             </div>
             <div>
-                    <ConnectWalletButton />
+                <ConnectWalletButton />
             </div>
         </main>
     )
