@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap'); */
 
 :root {
   --foreground-rgb: 255, 255, 255;
@@ -12,5 +12,5 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
-  font-family: 'Space Mono', monospace;
+  /* font-family: 'Space Mono', monospace; */
 }

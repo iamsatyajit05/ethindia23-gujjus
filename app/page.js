@@ -4,9 +4,10 @@ import Image from 'next/image'
 import Stake from './components/Stake';
 import Waves from './components/Waves';
 import Header from './components/Header';
+import Footer from './components/Footer';
 const ethers = require("ethers");
 import { useSDK, MetaMaskProvider } from '@metamask/sdk-react';
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 
 // const provider = new ethers.BrowserProvider(window.ethereum);
 
@@ -30,11 +31,12 @@ export default function Home() {
           position="top-center"
           reverseOrder={false}
         />
-        <div className='w-screen h-screen space-y-8'>
+        <div className='space-y-8'>
           <Header />
           <Stake />
           {/* <Waves /> */}
         </div>
+        <Footer />
       </MetaMaskProvider>
     </>
   )
