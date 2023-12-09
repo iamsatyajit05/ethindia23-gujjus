@@ -1,9 +1,17 @@
 import Image from 'next/image'
+import Stake from './components/Stake';
+import Waves from './components/Waves';
+import Header from './components/Header';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      Lets the hack begin
-    </main>
+    <>
+      {/* <Hero /> */}
+      <div className='w-screen h-screen space-y-8'>
+        <Header />
+        <Stake />
+        {/* <Waves /> */}
+      </div>
+    </>
   )
 }
