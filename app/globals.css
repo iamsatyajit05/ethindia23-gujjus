@@ -4,6 +4,10 @@
 
 /* @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap'); */
 
+::selection{
+  background: rgb(142, 49, 122);
+}
+
 :root {
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 20, 29, 47;
@@ -11,6 +15,6 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  background: linear-gradient(90deg, rgba(18, 19, 21, 0.5) -2.55%, rgba(142, 49, 122, 0.5) 68.34%, rgba(18, 19, 21, 0.5) 102.97%) black;
   /* font-family: 'Space Mono', monospace; */
 }

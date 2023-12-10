@@ -307,4 +307,4 @@ export const ABI = [
 	}
 ]
 
-export const smartContractAddress = '0xEDf85CF5996b97c2c966eE68711b18560EeC7034';
+export const smartContractAddress = '0xbb86FA6E15f34bA16C52368C8614b2A8dAaacB78';

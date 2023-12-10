@@ -33,9 +33,9 @@ const ConnectWalletButton = () => {
     };
 
     return (
-        <div className="h-14 relative" onMouseOver={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div className="h-14 relative mx-auto sm:m-0" onMouseOver={handleMouseEnter} onMouseLeave={handleMouseLeave}>
             <button
-                className="font-medium cursor-pointer rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95"
+                className="font-medium cursor-pointer rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95"
                 disabled={connecting || account}
                 onClick={connect}               
             >
@@ -84,7 +84,6 @@ export default function Header() {
                 }
 
                 try {
-                    console.log('lets go');
                     await window.ethereum.enable();
                     const accounts = await window.web3.eth.getAccounts();
 
@@ -112,14 +111,14 @@ export default function Header() {
     }, []);
 
     return (
-        <main className="max-w-4xl m-auto pt-12">
-            <div className='flex justify-between '>
-                <p className='text-2xl'>LEONIDA CASINO</p>
+        <main className="max-w-4xl p-12 sm:p-8 md:p-0 mx-auto">
+            <div className='flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0 sm:pt-12'>
+                <p className='flex flex-col items-center sm:flex-row sm:items-baseline space-x-0 sm:space-x-2 text-center sm:text-left'><span className='text-2xl'>LEONIDA CASINO</span><span>Predict GTA 6 Launch! Win Jackpot! Eazy!</span></p>
                 <ConnectWalletButton />
             </div>
             <div>
-                <p className='text-9xl font-black'>{totalStakedAmount ? totalStakedAmount : '0'} MATIC</p>
-                <p className='text-2xl'>STAKED BY {totalStaker ? totalStaker : '0'} ROCKERS</p>
+                <p className='text-5xl sm:text-7xl md:text-9xl font-black'>{totalStakedAmount ? totalStakedAmount : '0'} MATIC</p>
+                <p className='text-lg sm:text-2xl'>STAKED BY {totalStaker ? totalStaker : '0'} ROCKERS</p>
             </div>
         </main>
     )

@@ -1,18 +1,13 @@
 "use client"
-import { useEffect, useState } from 'react';
-import Image from 'next/image'
 import Stake from './components/Stake';
-import Waves from './components/Waves';
 import Header from './components/Header';
 import Footer from './components/Footer';
-const ethers = require("ethers");
-import { useSDK, MetaMaskProvider } from '@metamask/sdk-react';
+import { MetaMaskProvider } from '@metamask/sdk-react';
 import { Toaster } from 'react-hot-toast';
 
 // const provider = new ethers.BrowserProvider(window.ethereum);
 
 export default function Home() {
-  const [userAddress, setUserAddress] = useState('');
 
   const host = typeof window !== "undefined" ? window.location.host : "defaultHost";
   const sdkOptions = {
@@ -31,7 +26,7 @@ export default function Home() {
           position="top-center"
           reverseOrder={false}
         />
-        <div className='space-y-8'>
+        <div className='sm:space-y-8'>
           <Header />
           <Stake />
           {/* <Waves /> */}

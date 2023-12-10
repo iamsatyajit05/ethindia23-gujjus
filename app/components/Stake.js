@@ -13,10 +13,16 @@ export default function Stake() {
     const [isAlreadyStaked, setIsAlreadyStaked] = useState(false);
     const [stakedAmount, setStakedAmount] = useState(false);
     const [predictWeek, setPredictWeek] = useState(false);
-    const [totalStakedAmount, setTotalStakedAmount] = useState(0);
     const [isWithdrawn, setIsWithdrawn] = useState(false);
     const [isDateAnnounced, setIsDateAnnounced] = useState(false);
     const [rewardAmount, setRewardAmount] = useState(0);
+    const [isOwner, setIsOwner] = useState(false);
+    const [launchWeek, setLaunchWeek] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleModelClick = () => {
+        setIsModalOpen(!isModalOpen);
+    }
 
     const alreadyStakedChecked = async () => {
         if (window.ethereum) {
@@ -31,6 +37,11 @@ export default function Stake() {
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
 
                 const totalStaked = await contract.methods.getStakeInfo(accounts[0]).call();
+                const owner = await contract.methods.owner.call().call();
+
+                console.log("OWNER", owner, accounts[0]);
+
+                setIsOwner(owner.toLowerCase() == accounts[0].toLowerCase())
 
                 console.log("alreadyStakedChecked:", totalStaked);
 
@@ -68,34 +79,6 @@ export default function Stake() {
                 setIsDateAnnounced(launchWeek ? true : false);
             } catch (error) {
                 console.error('Error fetching checkDateAnnounced:', error);
-                toast.error("Something went wrong!");
-            }
-        } else {
-            console.error('Web3 not detected. Please install MetaMask.');
-            toast.error("Please install MetaMask.");
-        }
-    };
-
-    const fetchTotalStakedAmount = async () => {
-        if (window.ethereum) {
-            window.web3 = new Web3(window.ethereum);
-            try {
-                await window.ethereum.enable();
-                const accounts = await window.web3.eth.getAccounts();
-
-                const contractAddress = smartContractAddress;
-                const contractABI = ABI;
-
-                const contract = new window.web3.eth.Contract(contractABI, contractAddress);
-
-                const totalStaked = await contract.methods.totalStakedAmount.call().call();
-                const totalStakedInEther = web3.utils.fromWei(totalStaked, 'ether');
-
-                console.log("totalStaked:", totalStaked);
-
-                setTotalStakedAmount(totalStakedInEther);
-            } catch (error) {
-                console.error('Error fetching totalStakedAmount:', error);
                 toast.error("Something went wrong!");
             }
         } else {
@@ -144,14 +127,15 @@ export default function Stake() {
 
                 const contract = new window.web3.eth.Contract(contractABI, contractAddress);
 
-                const owner = await contract.methods.owner.call().call();
-                console.log(owner == accounts[0]);
-                const reward = await contract.methods.setFinalLaunchWeek(19).call();
+                console.log("setdate:", contract);
+                const receipt = await contract.methods.setFinalLaunchWeek(launchWeek).call();
 
-                console.log("setdate:", reward);
+                console.log("setdate:", receipt);
+                setIsModalOpen(false);
             } catch (error) {
                 console.error('Error fetching setDate:', error);
                 toast.error("Something went wrong!");
+                setIsModalOpen(false);
             }
         } else {
             console.error('Web3 not detected. Please install MetaMask.');
@@ -189,8 +173,6 @@ export default function Stake() {
         alreadyStakedChecked();
 
         checkDateAnnounced();
-
-        fetchTotalStakedAmount();
 
         calculateReward();
 
@@ -232,7 +214,7 @@ export default function Stake() {
                 const accounts = await window.web3.eth.getAccounts();
                 const account = accounts[0];
 
-                const contractAddress = '0xEDf85CF5996b97c2c966eE68711b18560EeC7034';
+                const contractAddress = smartContractAddress;
                 const contractABI = ABI;
 
                 const gasPrice = await web3.eth.getGasPrice();
@@ -278,7 +260,7 @@ export default function Stake() {
             icon: '⌛',
         });
         try {
-            const contractAddress = '0xEDf85CF5996b97c2c966eE68711b18560EeC7034';
+            const contractAddress = smartContractAddress;
             const contractABI = ABI;
 
             const contract = new window.web3.eth.Contract(contractABI, contractAddress);
@@ -305,24 +287,24 @@ export default function Stake() {
 
 
     return (
-        <main className="max-w-4xl m-auto">
+        <main className="max-w-4xl m-auto p-12 sm:p-8 md:p-0">
             {/* https://media-rockstargames-com.akamaized.net/mfe6/prod/__common/img/f7eab33a4989ce5f0cd89c70723909b3.jpg */}
-            <div className="flex justify-between space-x-12">
+            <div className="flex flex-col sm:flex-row gap-8 sm:gap-12 justify-between ">
                 {typeof account == "undefined"
-                    ? <div className="flex-1 bg-[#1e2a47] flex justify-center items-center h-72 rounded-2xl p-8">
+                    ? <div className="flex-1 bg-[rgba(0,0,0,0.5)] flex justify-center items-center h-72 rounded-2xl p-8">
                         Connect the wallet first
                     </div>
                     //     : !isDateAnnounced && predictWeek == 0
-                    //     ?  <div className="flex-1 bg-[#1e2a47] flex flex-col justify-center items-center h-72 rounded-2xl p-8">
+                    //     ?  <div className="flex-1 bg-[rgba(0,0,0,0.5)] flex flex-col justify-center items-center h-72 rounded-2xl p-8">
                     //     <p>Sorry, but you cant use this now.</p>
                     //                     <p>Launch Date is Announced.</p>
                     // </div>
                     : <>
-                        <div className="flex-1 bg-[#1e2a47] flex flex-col justify-between h-72 rounded-2xl p-8">
+                        <div className="flex-1 bg-[rgba(0,0,0,0.5)] flex flex-col justify-between h-72 rounded-2xl p-8 space-y-4">
 
                             {isDateAnnounced
                                 ? <div className={`${predictWeek == 0 ? 'flex-1' : ''} flex flex-col justify-center items-center h-full`}>
-                                    <p className='text-lg'>Sorry, but you cant stake now.</p>
+                                    <p className='text-lg'>Sorry, but you can't stake now.</p>
                                     <p className='text-lg'>Launch Date is Announced.</p>
                                 </div>
                                 : <>
@@ -340,18 +322,18 @@ export default function Stake() {
                                     </div>
                                     <div className='space-y-2'>
                                         <input id="week" type="week" name="week"
-                                            className='w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition' disabled={isAlreadyStaked}
+                                            className='w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition' disabled={isAlreadyStaked}
                                             onChange={(e) => setStakeWeek(e.target.value)} />
 
                                         <button type="button"
-                                            className="w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95"
+                                            className="w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95"
                                             onClick={stakeAmount} disabled={isAlreadyStaked}>{isAlreadyStaked ? ' Already Staked' : `Stake ${fixedStakeAmount} MATIC`}</button>
                                     </div>
                                 </>
                             }
 
                         </div>
-                        <div className={`${predictWeek == 0 ? 'hidden' : ''} flex-1 bg-[#1e2a47] rounded-2xl h-72 p-8 space-y-4 flex flex-col justify-center items-center text-center`}>
+                        <div className={`${predictWeek == 0 && isDateAnnounced ? 'hidden' : ''} flex-1 bg-[rgba(0,0,0,0.5)] rounded-2xl h-72 p-8 space-y-4 flex flex-col justify-center items-center text-center`}>
                             {isDateAnnounced
                                 ? rewardAmount != 0
                                     ? <div className='flex flex-col justify-center items-center text-center'>
@@ -372,25 +354,42 @@ export default function Stake() {
                             {isDateAnnounced
                                 ? rewardAmount != 0
                                     ?
-                                    <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" onClick={claimReward} disabled={isWithdrawn}>
+                                    <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95" onClick={claimReward} disabled={isWithdrawn}>
                                         {isWithdrawn
                                             ? 'Already Withdrawn'
                                             : 'Withdraw Jackpot'}
                                     </button>
-                                    : <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" disabled={true}>
+                                    : <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95" disabled={true}>
                                         Better Luck Next Time
                                     </button>
                                 : <div>
-                                    <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-blue-500 text-white hover:bg-blue-700 transition active:scale-95" disabled={true}>
+                                    <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95" disabled={true}>
                                         Date Not Announced Yet
                                     </button>
                                 </div>}
                         </div></>
                 }
             </div>
-            {account && account == "0x9740B274fe05bCD05C0557C96EB2C3993e39556a"
-                ? <button onClick={setDate}>SET DATE</button>
+            {account && isOwner
+                ? <button type="button" className="w-full mt-8 cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95" onClick={handleModelClick}>
+                    Set Launch Date
+                </button>
                 : ''}
+            {isModalOpen && (
+                <div className='absolute left-0 top-0 right-0 bottom-0 bg-[rgb(0,0,0,0.5)] flex justify-center z-20'>
+                    <div className="bg-black w-auto h-auto p-8 absolute z-30 top-8 flex flex-col gap-4 rounded-2xl">
+                        <p className='text-lg'>Set The Launch Date</p>
+                        <input
+                            type="text"
+                            value={launchWeek}
+                            className='w-full font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] hover:bg-[#DF5E9A] transition'
+                            onChange={(e) => setLaunchWeek(e.target.value)}
+                        />
+                        <button type="button" className="w-full cursor-pointer font-medium rounded-lg text-sm px-5 py-2.5 bg-[#E964AC] text-white hover:bg-[#DF5E9A] transition active:scale-95" onClick={setDate}>Save</button>
+                        <button onClick={handleModelClick}>Cancel</button>
+                    </div>
+                </div>
+            )}
         </main>
     )
 }
